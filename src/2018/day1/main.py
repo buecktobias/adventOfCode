@@ -1,6 +1,6 @@
 
-# Created by Tobias Bück at 2019-11-29 23:19:54.249226
-# Solution of 1 of advent of Code 2018
+# Created by Tobias Bück at 2019-11-30 20:36:47.313995
+# Solution of day 1 of advent of Code 2018
 # 
 # INPUTS 
 import utility     # helper methods
