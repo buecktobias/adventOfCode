@@ -1,5 +1,5 @@
 
-# Created by Tobias Bück at 2019-11-30 20:45:54.471271
+# Created by Tobias Bück at 2019-12-01 06:00:15.774113
 # Solution of day 1 of advent of Code 2019
 # 
 # INPUTS 
