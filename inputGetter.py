@@ -11,7 +11,6 @@ def make_template(year, day):
 # 
 # INPUTS 
 import utility     # helper methods
-import inputGetter    # script for getting input file
 
 def get_input_file():
     return open("../../../input/{year}/input{day}.txt")
@@ -31,8 +30,8 @@ def part2():
     
         
 def main():
-    part1()
-    part2()
+    print(f"part1: " + part1())
+    print(f"part2: " + part2())
 
 
 if __name__ == '__main__':
