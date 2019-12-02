@@ -5,7 +5,6 @@ import random
 # INPUTS 
 import utility     # helper methods
 import inputGetter    # script for getting input file
-import submitSolution   # script to submit uploading solution
 
 
 # opens the input file
@@ -58,15 +57,11 @@ def solve():
                 return
             numbers = get_numbers()
 
-
-
     return solution
     
     
 def main():
-    solution = solve()
-    level = 1  # level of the day, part, every day has two parts
-    #submitSolution.submit_solution_requests(2019, 2, level, solution)
+    solve()
 
 
 if __name__ == '__main__':
