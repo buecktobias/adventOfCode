@@ -1,9 +1,12 @@
-# Created by Tobias Bück at 2019-12-02 12:54:17.845450
+# Created by Tobias Bück at 2019-12-02 12:56:04.071130
 # Solution of day 3 of advent of Code 2019
 # 
 # INPUTS 
 import utility     # helper methods
 import inputGetter    # script for getting input file
+
+def get_input_file():
+    return open("../../../input/2019/day3.txt")
 
 def get_clean_data():
     with utility.get_input_file(2019, 3) as input_file:
