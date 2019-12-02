@@ -22,6 +22,7 @@ def get_numbers():
     input_file.close()
     return numbers
 
+
 def calculate(numbers):
     for i in range(0, len(numbers), 4):
         if numbers[i] == 1:
@@ -36,6 +37,7 @@ def calculate(numbers):
             print("broken")
             break
     return numbers
+
 
 # solve days puzzle
 def solve():
