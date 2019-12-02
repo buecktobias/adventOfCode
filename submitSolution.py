@@ -9,6 +9,8 @@ def submit_solution_requests(year, day, level, answer):
     bs = bs4.BeautifulSoup(r.text, features="html.parser")
     text = bs.find("p").text
     print(text)
+    # if success:
+    # git commit
 
 
 if __name__ == '__main__':
