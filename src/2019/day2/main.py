@@ -2,9 +2,10 @@ import random
 # Created by Tobias Bück at 2019-12-02 06:05:30.339167
 # Solution of day 2 of advent of Code 2019
 # 
-# INPUTS 
+# INPUTS
+from typing import List
+
 import utility     # helper methods
-import inputGetter    # script for getting input file
 
 
 # opens the input file
@@ -22,46 +23,56 @@ def get_numbers():
     return numbers
 
 
-def calculate(numbers):
+def multiply(a, b):
+    return a * b
+
+
+def add(a,b):
+    return a +b
+
+
+def calculate(numbers: List[int]):
     for i in range(0, len(numbers), 4):
-        if numbers[i] == 1:
-            ergebnis = numbers[numbers[i + 1]] + numbers[numbers[i + 2]]
-            numbers[numbers[i + 3]] = ergebnis
-        elif numbers[i] == 2:
-            ergebnis = numbers[numbers[i + 1]] * numbers[numbers[i + 2]]
-            numbers[numbers[i + 3]] = ergebnis
-        elif numbers[i] == 99:
+        opt_code = numbers[i]
+        if opt_code == 1:
+            operator = add
+        elif opt_code == 2:
+            operator = multiply
+        elif opt_code == 99:
             break
         else:
-            print("broken")
-            break
+            raise ValueError(f"opt code must be 1, 2 or 99, but is {opt_code}")
+
+        number1 = numbers[i + 1]
+        number2 = numbers[i + 2]
+        number3 = numbers[i + 3]
+        a = numbers[number1]
+        b = numbers[number2]
+        numbers[number3] = operator(a, b)
     return numbers
 
 
-# solve days puzzle
-def solve():
-    solution = 0
+def part1():
     numbers = get_numbers()
+    numbers[1] = 12
+    numbers[2] = 2
+    numbers = calculate(numbers)
+    return numbers[0]
 
-    for number1 in range(100):
-        for number2 in range(100):
-            numbers[1] = number1
-            numbers[2] = number2
-            try:
-                numbers = calculate(numbers)
-            except:
-                pass
-            if numbers[0] == 19690720:
-                print(numbers[1])
-                print(numbers[2])
-                return
+
+def part2():
+    for x in range(100):
+        for y in range(100):
             numbers = get_numbers()
+            numbers[1] = x
+            numbers[2] = y
+            numbers = calculate(numbers)
+            if numbers[0] == 19690720:
+                return 100 * x +y
 
-    return solution
-    
-    
 def main():
-    solve()
+    print(part1())
+    print(part2())
 
 
 if __name__ == '__main__':
