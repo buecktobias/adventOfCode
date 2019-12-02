@@ -2,42 +2,20 @@ import requests
 import os
 import conf
 import datetime
-import subprocess
 
 
 def make_template(year, day):
     date = datetime.datetime.now()
-    return f"""
-# Created by Tobias Bück at {str(date)}
-# Solution of {day} of advent of Code {year}
+    return f"""# Created by Tobias Bück at {str(date)}
+# Solution of day {day} of advent of Code {year}
 # 
 # INPUTS 
 import utility     # helper methods
 import inputGetter    # script for getting input file
-import submitSolution   # script to submit uploading solution
-
-
-# opens the input file
-def get_input_file():
-    return open("../../../{input_path(year, day)}")
-
-
-# solve days puzzle
-def solve():
-    solution = 0
-    input_file = get_input_file()
-    lines_input_file = utility.get_lines_of_file(input_file)
-    
-    
-    input_file.close()
-    return solution
-    
-    
+        
 def main():
-    solution = solve()
-    level = 1  # level of the day, part, every day has two parts
-    submitSolution.submit_solution_requests({year}, {day}, level, solution)
-
+    with utility.get_input_file({year}, {day}) as input_file:
+        lines_input_file = utility.get_lines_of_file(input_file)
 
 if __name__ == '__main__':
     main()    
@@ -82,11 +60,12 @@ def create_script(year, day):
     os.system(f"git add {path}")
     os.system(f"git commit -m \"created script for day {day}\"")
 
+
 def prepare(year, day):
     create_script(year, day)
     get_input(year, day)
 
 
 if __name__ == '__main__':
-    prepare(2018, 1)
+    prepare(2019, 2)
 

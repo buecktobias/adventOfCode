@@ -18,7 +18,7 @@ def solve():
     solution = 0
     input_file = get_input_file()
     lines_input_file = utility.get_lines_of_file(input_file)
-    
+    solution = sum([int(line) for line in lines_input_file if line != ""])
     
     input_file.close()
     return solution
