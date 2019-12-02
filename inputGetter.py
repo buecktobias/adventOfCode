@@ -12,10 +12,28 @@ def make_template(year, day):
 # INPUTS 
 import utility     # helper methods
 import inputGetter    # script for getting input file
+
+def get_input_file():
+    return open("../../../input/{year}/input{day}.txt")
+
+def get_clean_data():
+    with get_input_file() as input_file:
+        lines_input_file = utility.get_lines_of_file(input_file)
+    return lines_input_file    
+
+
+def part1():
+    lines = get_clean_data()
+
+
+def part2():
+    lines = get_clean_data()   
+    
         
 def main():
-    with utility.get_input_file({year}, {day}) as input_file:
-        lines_input_file = utility.get_lines_of_file(input_file)
+    part1()
+    part2()
+
 
 if __name__ == '__main__':
     main()    
@@ -48,11 +66,15 @@ def create_script(year, day):
     day_directory = f"src/{year}/day{day}"
     try:
         os.mkdir(f"src/{year}")
+    except FileExistsError:
+        pass
+
+    try:
         os.mkdir(day_directory)
     except FileExistsError:
         pass
     path = day_directory + "/main.py"
-    f = open(path, "w")
+    f = open(path, "x")
     f.write(make_template(year, day))
     f.close()
     # add to git
@@ -67,5 +89,5 @@ def prepare(year, day):
 
 
 if __name__ == '__main__':
-    prepare(2019, 2)
+    prepare(2019, 3)
 
