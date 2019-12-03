@@ -11,14 +11,13 @@ class Command:
         self.steps = steps
 
     def get_direction(self):
-        if self.direction == "L":
-            return -1, 0
-        elif self.direction == "R":
-            return 1, 0
-        elif self.direction == "U":
-            return 0, 1
-        elif self.direction == "D":
-            return 0, -1
+        directions = {
+            "L": (-1, 0),
+            "R": (1, 0),
+            "U": (0, 1),
+            "D": (0, -1)
+        }
+        return directions.get(self.direction)
 
 
 class Point:
@@ -41,19 +40,10 @@ class Point:
         return hash((self.x, self.y))
 
 
-class WirePoint:
-    def __init__(self, point, steps):
-        self.point = point
+class WirePoint(Point):
+    def __init__(self, x, y, steps):
         self.steps = steps
-
-    def __eq__(self, other):
-        return self.point.x == other.point.x and self.point.y == other.point.y
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash((self.point.x, self.point.y))
+        super().__init__(x, y)
 
 
 class Wire:
@@ -73,7 +63,7 @@ class Wire:
             direction = command.get_direction()
             for step in range(command.steps):
                 self.move(*direction)
-                points.add(Point(self.position.x, self.position.y))
+                points.add(WirePoint(self.position.x, self.position.y, self.steps))
         return points
 
 
@@ -88,7 +78,7 @@ def get_clean_data():
     return lines_input_file
 
 
-def part1():
+def get_intersection_points():
     lines = get_clean_data()
     wires = []
     for line in lines:
@@ -104,20 +94,29 @@ def part1():
 
     for point1 in wire1_points:
         if point1 in wire2_points:
-            intersection_points.append(point1)
+            for point2 in wire2_points:
+                if point1 == point2:
+                    point1.steps += point2.steps
+                    intersection_points.append(point1)
 
-    start_point = Point(0, 0)
+    return intersection_points
+
+
+def part1(intersection_points, start_point):
     nearest_intersection = min(intersection_points, key=lambda point: point.distance(start_point))
-    print(nearest_intersection.distance(start_point))   # solution part 1
+    return nearest_intersection.distance(start_point)
 
 
-def part2():
-    lines = get_clean_data()   
+def part2(intersection_points):
+    fewest_steps = min(intersection_points, key=lambda point: point.steps)
+    return fewest_steps.steps
     
         
 def main():
-    part1()
-    part2()
+    intersection_points = get_intersection_points()
+    start_point = Point(0, 0)
+    print(f"Part1 : {part1(intersection_points, start_point)}")
+    print(f"Part2 : {part2(intersection_points)}")
 
 
 if __name__ == '__main__':
