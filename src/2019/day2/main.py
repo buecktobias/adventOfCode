@@ -23,21 +23,13 @@ def get_numbers():
     return numbers
 
 
-def multiply(a, b):
-    return a * b
-
-
-def add(a,b):
-    return a +b
-
-
 def calculate(numbers: List[int]):
     for i in range(0, len(numbers), 4):
         opt_code = numbers[i]
         if opt_code == 1:
-            operator = add
+            operator = int.__add__
         elif opt_code == 2:
-            operator = multiply
+            operator = int.__mul__
         elif opt_code == 99:
             break
         else:
@@ -68,7 +60,8 @@ def part2():
             numbers[2] = y
             numbers = calculate(numbers)
             if numbers[0] == 19690720:
-                return 100 * x +y
+                return 100 * x + y
+
 
 def main():
     print(part1())
