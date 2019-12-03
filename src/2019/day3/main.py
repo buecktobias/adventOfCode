@@ -58,12 +58,12 @@ class Wire:
         self.steps += 1
 
     def calculate_points(self):
-        points = set()
+        points = {}
         for command in self.commands:
             direction = command.get_direction()
             for step in range(command.steps):
                 self.move(*direction)
-                points.add(WirePoint(self.position.x, self.position.y, self.steps))
+                points[Point(self.position.x, self.position.y)] = self.steps
         return points
 
 
@@ -90,16 +90,14 @@ def get_intersection_points():
     wire1_points = wires[0].calculate_points()
     wire2_points = wires[1].calculate_points()
 
-    intersection_points = []
+    intersection_points = set(wire1_points.keys()) & set(wire2_points.keys())
+    intersection_points_steps = []
 
-    for point1 in wire1_points:
-        if point1 in wire2_points:
-            for point2 in wire2_points:
-                if point1 == point2:
-                    point1.steps += point2.steps
-                    intersection_points.append(point1)
-
-    return intersection_points
+    for intersection_point in intersection_points:
+        steps = wire1_points[intersection_point] + wire2_points[intersection_point]
+        new_wire_point = WirePoint(intersection_point.x, intersection_point.y, steps)
+        intersection_points_steps.append(new_wire_point)
+    return intersection_points_steps
 
 
 def part1(intersection_points, start_point):
