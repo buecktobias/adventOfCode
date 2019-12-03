@@ -3,8 +3,6 @@
 # 
 # INPUTS 
 import utility     # helper methods
-import inputGetter    # script for getting input file
-from typing import List
 
 
 class Command:
@@ -36,6 +34,9 @@ class Point:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __hash__(self):
         return hash((self.x, self.y))
 
@@ -45,37 +46,34 @@ class WirePoint:
         self.point = point
         self.steps = steps
 
+    def __eq__(self, other):
+        return self.point.x == other.point.x and self.point.y == other.point.y
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.point.x, self.point.y))
+
 
 class Wire:
     def __init__(self, commands):  # commands = R5,U8 ...
         self.commands = commands
         self.position = Point(0, 0)
+        self.steps = 0
 
     def move(self, x, y):
-        self.position.x = x
-        self.position.y = y
-
-    def steps_to_reach(self, x, y):
-        steps = 0
-        while self.position.x != x and self.position.y != y:
-            for command in self.commands:
-                dir_x, dir_y = command.get_direction()
-                for step in range(command.steps):
-                    new_x = self.position.x + dir_x
-                    new_y = self.position.y + dir_y
-                    self.move(new_x, new_y)
-                    steps += 1
-        return steps
+        self.position.x += x
+        self.position.y += y
+        self.steps += 1
 
     def calculate_points(self):
         points = set()
         for command in self.commands:
-            dir_x, dir_y = command.get_direction()
+            direction = command.get_direction()
             for step in range(command.steps):
-                new_x = self.position.x + dir_x
-                new_y = self.position.y + dir_y
-                self.move(new_x, new_y)
-                points.add((new_x, new_y))
+                self.move(*direction)
+                points.add(Point(self.position.x, self.position.y))
         return points
 
 
@@ -88,10 +86,6 @@ def get_clean_data():
         lines_input_file = utility.get_lines_of_file(input_file)
     lines_input_file = list([line.split(",") for line in lines_input_file])
     return lines_input_file
-
-
-def manhattan_distance(point1, point2):
-    return abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
 
 
 def part1():
@@ -110,17 +104,11 @@ def part1():
 
     for point1 in wire1_points:
         if point1 in wire2_points:
-            intersection_points.append(point1)  # does not matter both are same
+            intersection_points.append(point1)
 
-    start_point = (0, 0)
-
-    shortest = 999999
-    for point in intersection_points:
-        steps_sum = wires[0].steps_to_reach(point[0], point[1]) + wires[1].steps_to_reach(point[0], point[1])
-        if steps_sum < shortest:
-            shortest = steps_sum
-    print(shortest)
-
+    start_point = Point(0, 0)
+    nearest_intersection = min(intersection_points, key=lambda point: point.distance(start_point))
+    print(nearest_intersection.distance(start_point))   # solution part 1
 
 
 def part2():
