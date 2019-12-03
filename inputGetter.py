@@ -83,7 +83,7 @@ def create_script(year, day):
 
 
 def prepare(year, day):
-    create_script(year, day)
+    #create_script(year, day)
     get_input(year, day)
 
 
