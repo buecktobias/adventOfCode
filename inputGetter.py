@@ -83,10 +83,10 @@ def create_script(year, day):
 
 
 def prepare(year, day):
-    #create_script(year, day)
+    create_script(year, day)
     get_input(year, day)
 
 
 if __name__ == '__main__':
-    prepare(2019, 3)
+    prepare(2019, 4)
 
