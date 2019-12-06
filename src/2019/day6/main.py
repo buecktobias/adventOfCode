@@ -1,4 +1,4 @@
-# Created by Tobias Bück at 2019-12-06 05:58:13.430364
+# Created by Tobias Bück at 2019-12-06 06:05:15.363116
 # Solution of day 6 of advent of Code 2019
 # 
 # INPUTS 
