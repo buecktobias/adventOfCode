@@ -22,7 +22,7 @@ def has_increasing_digits(str_number):
     return True
 
 
-def has_double_adjacent(str_number):
+def has_adjacent(str_number):
     for i in range(1, len(str_number)):
         if int(str_number[i]) == int(str_number[i-1]):
             return True
@@ -42,7 +42,7 @@ def has_only_2_adjacent(str_number):
 
 def is_correct_password_part1(password):
     str_password = str(password)
-    return has_increasing_digits(str_password) and has_double_adjacent(str_password)
+    return has_increasing_digits(str_password) and has_adjacent(str_password)
 
 
 def is_correct_password_part2(password):

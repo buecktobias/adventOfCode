@@ -73,7 +73,7 @@ def create_script(year, day):
     except FileExistsError:
         pass
     path = day_directory + "/main.py"
-    f = open(path, "x")
+    f = open(path, "w")
     f.write(make_template(year, day))
     f.close()
     # add to git
@@ -88,5 +88,5 @@ def prepare(year, day):
 
 
 if __name__ == '__main__':
-    prepare(2019, 4)
+    prepare(2019, 6)
 
