@@ -84,7 +84,80 @@ class Halt(OptFunction):
 class JumpTrue(OptFunction):
     @staticmethod
     def execute(params, input_parser, modes):
-        pass
+        numbers = input_parser.numbers
+        a = params[0]
+        b = params[1]
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
+
+        if a != 0:
+            input_parser.pointer = b
+
+        return numbers
+
+
+class JumpFalse(OptFunction):
+    @staticmethod
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
+        a = params[0]
+        b = params[1]
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
+
+        if a == 0:
+            input_parser.pointer = b
+
+        return numbers
+
+
+class LessThan(OptFunction):
+    @staticmethod
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
+        a = params[0]
+        b = params[1]
+        c = params[2]
+
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
+
+        if a < b:
+            numbers[c] = 1
+        else:
+            numbers[c] = 0
+        return numbers
+
+
+class Equals(OptFunction):
+    @staticmethod
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
+        a = params[0]
+        b = params[1]
+        c = params[2]
+
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
+
+        if a == b:
+            numbers[c] = 1
+        else:
+            numbers[c] = 0
+        return numbers
+
 
 
 class OptCode(bytes, enum.Enum):
@@ -99,10 +172,10 @@ class OptCode(bytes, enum.Enum):
     INPUT = (3, 1, Input)
     OUTPUT = (4, 1, Output)
     HALT = (99, 0, Halt)
-    #JUMP_TRUE = (5, 2, )
-    #JUMP_FALSE = (6, 2,)
-    #LESS_THAN = (7, 3,)
-    #EQUALS = (8, 3,)
+    JUMP_TRUE = (5, 2, JumpTrue)
+    JUMP_FALSE = (6, 2, JumpFalse)
+    LESS_THAN = (7, 3, LessThan)
+    EQUALS = (8, 3, Equals)
 
     def execute(self, params: List[int], input_parser, modes):
         assert self.amount_parameters == len(params), "The opt code needs a different amount of parameters!"
@@ -147,9 +220,11 @@ class InputParser:
     def start(self):
         while True:
             int_code = self.get_int_code()
+            pointer_before = int(self.pointer)
             int_code.execute(self)
             opt_code_params = int_code.opt_code.amount_parameters
-            self.forward(opt_code_params + 1)
+            if pointer_before == self.pointer:
+                self.forward(opt_code_params + 1)
 
 
 def get_input_file():
