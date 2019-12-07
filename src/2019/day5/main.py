@@ -4,7 +4,6 @@
 # INPUTS
 from typing import List, Dict, Any
 
-import utility     # helper methods
 import enum
 import abc
 
@@ -12,35 +11,49 @@ import abc
 class OptFunction(abc.ABC):
     @staticmethod
     @abc.abstractmethod
-    def execute(params, numbers, modes):
+    def execute(params, input_parser, modes):
         pass
 
 
 class Add(OptFunction):
     @staticmethod
-    def execute(params, numbers, modes):
-        # TODO modes !
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
         a = params[0]
         b = params[1]
         c = params[2]
+
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
+
         numbers[c] = a + b
         return numbers
 
 
 class Multiply(OptFunction):
     @staticmethod
-    def execute(params, numbers, modes):
-        # TODO modes !
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
         a = params[0]
         b = params[1]
         c = params[2]
+
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        if modes[1] == Mode.POSITION_MODE:
+            b = numbers[b]
         numbers[c] = a * b
         return numbers
 
 
 class Input(OptFunction):
     @staticmethod
-    def execute(params, numbers, modes):
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
         # TODO modes !
         a = params[0]
         numbers[a] = int(input())
@@ -49,18 +62,29 @@ class Input(OptFunction):
 
 class Output(OptFunction):
     @staticmethod
-    def execute(params, numbers, modes):
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
         # TODO modes !
         a = params[0]
-        print(numbers[a])
+        if modes[0] == Mode.POSITION_MODE:
+            a = numbers[a]
+
+        print(a)
         return numbers
 
 
 class Halt(OptFunction):
     @staticmethod
-    def execute(params, numbers, modes):
+    def execute(params, input_parser, modes):
+        numbers = input_parser.numbers
         # TODO modes !
         raise ValueError("HALT")
+
+
+class JumpTrue(OptFunction):
+    @staticmethod
+    def execute(params, input_parser, modes):
+        pass
 
 
 class OptCode(bytes, enum.Enum):
@@ -75,11 +99,15 @@ class OptCode(bytes, enum.Enum):
     INPUT = (3, 1, Input)
     OUTPUT = (4, 1, Output)
     HALT = (99, 0, Halt)
+    #JUMP_TRUE = (5, 2, )
+    #JUMP_FALSE = (6, 2,)
+    #LESS_THAN = (7, 3,)
+    #EQUALS = (8, 3,)
 
-    def execute(self, params: List[int], numbers: List[int], modes):
+    def execute(self, params: List[int], input_parser, modes):
         assert self.amount_parameters == len(params), "The opt code needs a different amount of parameters!"
         cls = self.cls
-        return cls.execute(params, numbers, modes)
+        return cls.execute(params, input_parser, modes)
 
 
 class Mode(enum.Enum):
@@ -94,10 +122,8 @@ class IntCode:
         self._params: List[int] = params
         self.modes: List[Mode] = modes
 
-
-    def execute(self, numbers):
-        params = self._get_params(numbers)
-        return self.opt_code.execute(params, numbers, self.modes)
+    def execute(self, input_parser):
+        return self.opt_code.execute(self._params, input_parser, self.modes)
 
 
 class InputParser:
@@ -114,14 +140,14 @@ class InputParser:
             digits = "0" + digits
         modes = map(lambda e: int(e), digits[:3])
         opt_code = OptCode(int(digits[3:]))
-        modes = list(map(lambda digit_mode: Mode(digit_mode), modes))
+        modes = list(reversed(list(map(lambda digit_mode: Mode(digit_mode), modes))))
         params = self.numbers[self.pointer + 1: self.pointer + 1 + opt_code.amount_parameters]
         return IntCode(opt_code, params, modes)
 
     def start(self):
         while True:
             int_code = self.get_int_code()
-            int_code.execute(self.numbers)
+            int_code.execute(self)
             opt_code_params = int_code.opt_code.amount_parameters
             self.forward(opt_code_params + 1)
 
