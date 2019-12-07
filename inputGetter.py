@@ -88,5 +88,5 @@ def prepare(year, day):
 
 
 if __name__ == '__main__':
-    prepare(2019, 6)
+    prepare(2019, 7)
 

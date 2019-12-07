@@ -12,13 +12,14 @@ import abc
 class OptFunction(abc.ABC):
     @staticmethod
     @abc.abstractmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
         pass
 
 
 class Add(OptFunction):
     @staticmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
+        # TODO modes !
         a = params[0]
         b = params[1]
         c = params[2]
@@ -28,7 +29,8 @@ class Add(OptFunction):
 
 class Multiply(OptFunction):
     @staticmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
+        # TODO modes !
         a = params[0]
         b = params[1]
         c = params[2]
@@ -38,7 +40,8 @@ class Multiply(OptFunction):
 
 class Input(OptFunction):
     @staticmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
+        # TODO modes !
         a = params[0]
         numbers[a] = int(input())
         return numbers
@@ -46,7 +49,8 @@ class Input(OptFunction):
 
 class Output(OptFunction):
     @staticmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
+        # TODO modes !
         a = params[0]
         print(numbers[a])
         return numbers
@@ -54,88 +58,46 @@ class Output(OptFunction):
 
 class Halt(OptFunction):
     @staticmethod
-    def execute(params, numbers):
+    def execute(params, numbers, modes):
+        # TODO modes !
         raise ValueError("HALT")
 
 
-class OptCode(enum.Enum):
-    ADD = 1
-    MULTIPLY = 2
-    INPUT = 3
-    OUTPUT = 4
-    HALT = 99
+class OptCode(bytes, enum.Enum):
+    def __new__(cls, value, amount_parameters, function):
+        obj = bytes.__new__(cls, [value])
+        obj._value_ = value
+        obj.amount_parameters = amount_parameters
+        obj.cls = function
+        return obj
+    ADD = (1, 3, Add)
+    MULTIPLY = (2, 3, Multiply)
+    INPUT = (3, 1, Input)
+    OUTPUT = (4, 1, Output)
+    HALT = (99, 0, Halt)
 
-    @staticmethod
-    def from_value(value):
-        values = {
-            1: OptCode.ADD,
-            2: OptCode.MULTIPLY,
-            3: OptCode.INPUT,
-            4:  OptCode.OUTPUT,
-            99: OptCode.HALT
-        }
-        return values.get(value)
-
-
-    @property
-    def amount_parameters(self):
-        parameter_dict = {
-            OptCode.ADD: 3,
-            OptCode.MULTIPLY: 3,
-            OptCode.HALT: 0,
-            OptCode.INPUT: 1,
-            OptCode.OUTPUT: 1
-        }
-        return parameter_dict.get(self)
-    
-    def execute(self, params: List[int], numbers: List[int]):
+    def execute(self, params: List[int], numbers: List[int], modes):
         assert self.amount_parameters == len(params), "The opt code needs a different amount of parameters!"
-        functions_dict: Dict[OptCode, Any] = {
-            OptCode.ADD:  Add,
-            OptCode.HALT: Halt,
-            OptCode.MULTIPLY: Multiply,
-            OptCode.OUTPUT: Output,
-            OptCode.INPUT: Input
-        }
-
-        cls = functions_dict.get(self)
-        return cls.execute(params, numbers)
+        cls = self.cls
+        return cls.execute(params, numbers, modes)
 
 
 class Mode(enum.Enum):
-    @staticmethod
-    def from_value(value):
-        values_dict = {
-            0: Mode.POSITION_MODE,
-            1: Mode.IMMEDIATE_MODE
-        }
-        return values_dict.get(value)
-
     POSITION_MODE = 0
     IMMEDIATE_MODE = 1
 
 
-
-
 class IntCode:
-    def __init__(self, opt_code: OptCode, params: List[int], modes):
+    def __init__(self, opt_code: OptCode, params: List[int], modes: List[Mode]):
         assert len(params) == opt_code.amount_parameters, "The opt code needs a different amount of parameters!"
         self.opt_code: OptCode = opt_code
-        self.params: List[int] = params
+        self._params: List[int] = params
         self.modes: List[Mode] = modes
 
-    def _get_params(self, numbers):
-        params = []
-        for i in range(len(self.params)):
-            if self.modes[i] == Mode.IMMEDIATE_MODE:
-                params.append(self.params[i])
-            else:
-                params.append(numbers[self.params[i]])
-        return params
 
     def execute(self, numbers):
-        params = self.params
-        return self.opt_code.execute(params, numbers)
+        params = self._get_params(numbers)
+        return self.opt_code.execute(params, numbers, self.modes)
 
 
 class InputParser:
@@ -147,17 +109,12 @@ class InputParser:
         self.pointer += steps
 
     def get_int_code(self):
-        code = list(str(self.numbers[self.pointer]))
-        reversed_code = list(reversed(code))
-        int_opt_code = int("".join(reversed_code)[:2])
-        opt_code: OptCode = OptCode.from_value(int_opt_code)
-        str_modes = reversed_code[2:]
-        modes = []
-        for i in range(3):
-            if len(str_modes) > i and str_modes[i] == "1":
-                modes.append(Mode.from_value(1))
-            else:
-                modes.append(Mode.from_value(0))
+        digits = str(self.numbers[self.pointer])
+        while len(digits) < 5:
+            digits = "0" + digits
+        modes = map(lambda e: int(e), digits[:3])
+        opt_code = OptCode(int(digits[3:]))
+        modes = list(map(lambda digit_mode: Mode(digit_mode), modes))
         params = self.numbers[self.pointer + 1: self.pointer + 1 + opt_code.amount_parameters]
         return IntCode(opt_code, params, modes)
 
@@ -188,7 +145,6 @@ def get_value(numbers, number, is_immediate):
         return numbers[number]
 
 
-
 def part1():
     numbers = get_clean_data()
     program = InputParser(numbers)
@@ -205,5 +161,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print(str(int("1100")))
-    main()    
+    main()
