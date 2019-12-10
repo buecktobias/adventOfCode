@@ -3,13 +3,25 @@
 # 
 # INPUTS 
 import utility  # helper methods
-from sympy import *
+import sympy
+import tkinter as tk
+
+class Object:
+    def show(self, canvas, scale):
+        pass
 
 
-class Vector:
+class Vector(Object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def show(self, canvas, scale):
+        x1 = self.x * scale
+        y1 = self.y * scale
+
+        size = scale / 2
+        canvas.create_oval(x1-size, y1-size, x1+size, y1 + size)
 
     def __add__(self, other):
         new_vec = Vector(self.x, self.y)
@@ -30,19 +42,42 @@ class Vector:
         return self.x == other.x and self.y == other.y
 
 
-class StraightLine:
+class StraightLine(Object):
     def __init__(self, x, y, dir_x, dir_y):
         self.position_vector = Vector(x, y)
         self.direction_vector = Vector(dir_x, dir_y)
 
-    def intersects(self, vector: Vector):
+    def show(self, canvas, scale):
+        x1 = self.position_vector.x
+        y1 = self.position_vector.y
+        x2 = self.position_vector.x + self.direction_vector.x
+        y2 = self.position_vector.y + self.direction_vector.y
+
+        x1 *= scale
+        x2 *= scale
+        y1 *= scale
+        y2 *= scale
+        canvas.create_line()
+
+    def intersects(self, vec: Vector):
         t = sympy.symbols('t')
-        print(sympy.solve([self.position_vector + t * self.direction_vector, vector]))
+        eq_x = sympy.Eq(self.position_vector.x + self.direction_vector.x * t, vec.x)
+        eq_y = sympy.Eq(self.position_vector.y + self.direction_vector.y * t, vec.y)
+        system = [eq_x, eq_y]
+        solution = sympy.solve(system, t)
+
+        if len(solution) > 0:
+            if solution[t] > 1:  # t must be greater than 1
+                return True
+        return False
 
 
-class Asteroid:
+class Asteroid(Object):
     def __init__(self, x, y):
         self.vec = Vector(x, y)
+
+    def show(self, canvas, scale):
+        self.vec.show(canvas, scale)
 
     def get_nearest_asteroid(self, asteroids):
         asteroids_copy = asteroids[:]
@@ -60,13 +95,30 @@ class Asteroid:
             asteroids_copy.remove(nearest)
             counter += 1
             # asteroids rausschmeissen
-
-            asteroids_copy = list(filter(lambda ast: self.is_asteroid_in_sight(ast, x_diff, y_diff), asteroids_copy))
+            x_diff = nearest.vec.x - self.vec.x
+            y_diff = nearest.vec.y - self.vec.y
+            new_straight_line = StraightLine(self.vec.x, self.vec.y, x_diff, y_diff)
+            asteroids_copy = list(filter(lambda ast: not new_straight_line.intersects(ast.vec), asteroids_copy))
+            pass
         return counter
 
 
+class Application(tk.Canvas):
+    def __init__(self, objects, master=None):
+        super().__init__(master)
+        self.master = master
+        self.pack()
+        self.objects = objects
+        self.create_widgets()
+
+    def create_widgets(self):
+        scale = 20
+        for object in self.objects:
+            object.show(self, scale)
+
+
 def get_input_file():
-    return open("../../../input/2019/input10.txt")
+    return open("../../../input/2019/test10_2")
 
 
 def get_clean_data():
@@ -90,6 +142,7 @@ def part1():
         for x in range(max_x):
             if lines[y][x] == '#':
                 asteroids.append(Asteroid(x, y))
+
     best = max(asteroids, key=lambda ast: ast.asteroids_in_sight(asteroids))
     print(best.asteroids_in_sight(asteroids))
 
@@ -99,10 +152,9 @@ def part2():
 
 
 def main():
-
-    """
     print(f"part1: " + str(part1()))
     print(f"part2: " + str(part2()))
-    """
+
+
 if __name__ == '__main__':
     main()
