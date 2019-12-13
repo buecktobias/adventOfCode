@@ -4,6 +4,13 @@
 # INPUTS 
 import utility  # helper methods
 import re
+from mpl_toolkits.mplot3d import Axes3D
+
+import numpy as np
+import matplotlib.pyplot as plt
+import mpl_toolkits.mplot3d.axes3d as p3
+import matplotlib.animation as animation
+from mpl_toolkits.mplot3d.art3d import juggle_axes
 
 
 class Vector:
@@ -79,7 +86,7 @@ class Moon:
         return self.kinetic_energy * self.potential_energy
 
     def __repr__(self):
-        return f"{self.name}({self.position})"
+        return f"{self.name} pos=({self.position}) vel=({self.velocity})"
 
 
 def get_input_file():
@@ -106,6 +113,52 @@ def time_step(moons):
 def time_steps(n_steps, moons):
     for n in range(n_steps):
         time_step(moons)
+        print(moons)
+
+
+
+class MoonAnimation:
+    def __init__(self):
+        self.fig = plt.figure()
+        self.ax = p3.Axes3D(self.fig)
+        self.data = self.get_data()
+        self.scat = None
+        self.ani = animation.FuncAnimation(self.fig, self.update, frames=40, interval=20, init_func=self.setup_plot, blit=True)
+        self.colors = ['red', 'green', 'blue', 'yellow']
+    def get_data(self):
+        moons = Moon.moons
+        while True:
+            time_step(moons)
+            yield moons_cords(moons)
+
+    def setup_plot(self):
+        """Initial drawing of the scatter plot."""
+        xs, ys, zs = next(self.data)
+        self.scat = self.ax.scatter(xs, ys, zs,c =self.colors)
+        return self.scat,
+
+    def update(self, i):
+        xs, ys, zs = next(self.data)
+        self.scat._offsets3d = juggle_axes(xs, ys, zs, 'z')
+        return self.scat,
+
+    def show(self):
+        plt.show()
+
+    def save(self):
+        writer = animation.FFMpegWriter(fps=2, codec='libx264')
+        self.ani.save("animation.mp4", writer=writer)
+
+
+def moons_cords(moons):
+    xs = []
+    ys = []
+    zs = []
+    for moon in moons:
+        xs.append(moon.position.x)
+        ys.append(moon.position.y)
+        zs.append(moon.position.z)
+    return xs, ys, zs
 
 
 def part1():
@@ -123,7 +176,13 @@ def part2():
 
 
 def main():
-    part1()
+    # part1()
+    lines = get_clean_data()
+    moons = []
+    for line in lines:
+        moons.append(Moon(" ", *line))
+    moonAni = MoonAnimation()
+    moonAni.save()
 
 
 if __name__ == '__main__':
