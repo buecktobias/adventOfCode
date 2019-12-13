@@ -73,6 +73,10 @@ class Moon:
     def move(self):
         self.position += self.velocity
 
+    @classmethod
+    def get_energy(cls):
+        return sum([moon.energy for moon in cls.moons])
+
     @property
     def potential_energy(self):
         return abs(self.position)
@@ -147,7 +151,7 @@ class MoonAnimation:
 
     def save(self):
         writer = animation.FFMpegWriter(fps=2, codec='libx264')
-        self.ani.save("animation.mp4", writer=writer)
+        self.ani.save("3dmoons_animation.mp4", writer=writer)
 
 
 def moons_cords(moons):
@@ -167,8 +171,32 @@ def part1():
     for line in lines:
         moons.append(Moon(" ", *line))
     time_steps(1000, moons)
-    result = sum([moon.energy for moon in moons])
+    result = Moon.get_energy()
     print(result)
+
+
+def energy_plot():
+    amount_data = 100
+    xs = list(range(amount_data))
+    ys = []
+    for i in range(amount_data):
+        ys.append(Moon.moons)
+
+
+def _2d_positions_plot(cord: int):# 0 -> x, 1 -> y, 2-> z
+    ys_moons = []
+    amount_data = 100
+    for i in range(amount_data):
+        ys = []
+        for moon in Moon.moons:
+            ys.append(moon.position.cords[cord])
+        ys_moons.append(ys)
+        time_step(Moon.moons)
+    for i in range(len(Moon.moons)):
+        xs = list(range(amount_data))
+        ys = [_ys[i] for _ys in ys_moons]
+        plt.plot(xs, ys)
+    plt.show()
 
 
 def part2():
@@ -181,8 +209,9 @@ def main():
     moons = []
     for line in lines:
         moons.append(Moon(" ", *line))
-    moonAni = MoonAnimation()
-    moonAni.save()
+    _2d_positions_plot(0)
+    _2d_positions_plot(1)
+    _2d_positions_plot(2)
 
 
 if __name__ == '__main__':
