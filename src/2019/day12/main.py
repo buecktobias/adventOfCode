@@ -129,6 +129,7 @@ class MoonAnimation:
         self.scat = None
         self.ani = animation.FuncAnimation(self.fig, self.update, frames=40, interval=20, init_func=self.setup_plot, blit=True)
         self.colors = ['red', 'green', 'blue', 'yellow']
+
     def get_data(self):
         moons = Moon.moons
         while True:
@@ -176,16 +177,19 @@ def part1():
 
 
 def energy_plot():
-    amount_data = 100
+    amount_data = 10000
     xs = list(range(amount_data))
     ys = []
     for i in range(amount_data):
-        ys.append(Moon.moons)
+        ys.append(Moon.get_energy())
+        time_step(Moon.moons)
+    plt.plot(xs, ys)
+    plt.show()
 
 
 def _2d_positions_plot(cord: int):# 0 -> x, 1 -> y, 2-> z
     ys_moons = []
-    amount_data = 100
+    amount_data = 1000
     for i in range(amount_data):
         ys = []
         for moon in Moon.moons:
@@ -209,6 +213,7 @@ def main():
     moons = []
     for line in lines:
         moons.append(Moon(" ", *line))
+
     _2d_positions_plot(0)
     _2d_positions_plot(1)
     _2d_positions_plot(2)
