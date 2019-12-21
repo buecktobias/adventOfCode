@@ -30,8 +30,8 @@ def part2():
     
         
 def main():
-    print(f"part1: " + part1())
-    print(f"part2: " + part2())
+    print(f"part1: {"{"}part1(){"}"})
+    print(f"part2: {"{"}part2(){"}"})
 
 
 if __name__ == '__main__':
@@ -88,5 +88,5 @@ def prepare(year, day):
 
 
 if __name__ == '__main__':
-    prepare(2019, 14)
+    prepare(2019, 16)
 

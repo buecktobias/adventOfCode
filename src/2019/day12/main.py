@@ -23,6 +23,12 @@ class Vector:
     def cords(self):
         return self.x, self.y, self.z
 
+    @cords.setter
+    def cords(self, new_cords):
+        self.x = new_cords[0]
+        self.y = new_cords[1]
+        self.z = new_cords[2]
+
     def __abs__(self):
         return sum([abs(cord) for cord in self.cords])
 
@@ -55,20 +61,11 @@ class Moon:
             self.gravity(moon)
 
     def gravity(self, other):
-        if self.position.x > other.position.x:
-            self.velocity.x -= 1
-        elif self.position.x < other.position.x:
-            self.velocity.x += 1
-
-        if self.position.y > other.position.y:
-            self.velocity.y -= 1
-        elif self.position.y < other.position.y:
-            self.velocity.y += 1
-
-        if self.position.z > other.position.z:
-            self.velocity.z -= 1
-        elif self.position.z < other.position.z:
-            self.velocity.z += 1
+        for i in range(len(self.position.cords)):
+            if self.position.cords[i] > other.position.cords[i]:
+                vel = self.velocity.cords
+                vel[i] += 1
+                self.velocity.cords = vel
 
     def move(self):
         self.position += self.velocity
@@ -117,8 +114,6 @@ def time_step(moons):
 def time_steps(n_steps, moons):
     for n in range(n_steps):
         time_step(moons)
-        print(moons)
-
 
 
 class MoonAnimation:
@@ -208,7 +203,7 @@ def part2():
 
 
 def main():
-    # part1()
+    part1()
     lines = get_clean_data()
     moons = []
     for line in lines:
