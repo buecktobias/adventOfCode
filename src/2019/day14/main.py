@@ -138,7 +138,7 @@ def calculate_cost_of_making_reactions(reaction, leftovers, times=1):
 def amount_of_ore(molecule_set: MoleculeSet, leftovers: Dict[Molecule, int] = None) -> Tuple[int, Dict[Molecule, int]]:
     """
     @rtype: Tuple[int, Dict[Molecule, int]]
-    @param molecule_set: THe specific molecule of which the amount of ore should be find out.
+    @param molecule_set: The specific molecule of which the amount of ore should be find out.
     @param leftovers: All Molecules created
     @return: returns the amount of ore needed to create a specific molecule
     """

@@ -90,8 +90,6 @@ def part1():
 
     best = max(asteroids, key=lambda ast: ast.asteroids_in_sight(asteroids))
 
-    print(best.asteroids_in_sight(asteroids))
-
     vaporized = best.vaporize(asteroids)
     print(vaporized[200])
     x = vaporized[200].vec.x
